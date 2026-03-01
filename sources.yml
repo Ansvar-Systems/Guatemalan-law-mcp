@@ -4,25 +4,29 @@ mcp_name: "Guatemala Law MCP"
 jurisdiction: "GT"
 
 sources:
-  - name: "Guatemala Official Legal Portal"
-    authority: "Guatemala Government"
-    official_portal: "https://cenadoj.gob.gt"
+  - name: "Justia Guatemala"
+    authority: "Justia (mirrors Guatemala official legislation)"
+    official_portal: "https://guatemala.justia.com"
     canonical_identifier: "gt-law"
-    retrieval_method: "HTML/PDF scraping"
+    retrieval_method: "HTML scraping"
     api_documentation: "N/A"
     update_frequency: "As laws are enacted"
-    last_ingested: "pending"
+    last_ingested: "2026-03-01"
     license_or_terms:
       type: "Government Publication"
-      url: "https://cenadoj.gob.gt"
-      summary: "Official government legal database; legislation is public domain as government publication"
+      url: "https://guatemala.justia.com"
+      summary: "Justia mirrors official Guatemalan legislation; legislation is public domain as government publication"
     coverage:
-      scope: "Pending census and ingestion"
-      limitations: "Corpus not yet ingested"
+      scope: "National laws, decrees, and declarations"
+      categories:
+        - "leyes (national laws)"
+        - "decretos (decrees)"
+        - "declaratorias (declarations)"
+      limitations: "Coverage depends on Justia mirror completeness"
     languages:
       - "es"
 
 data_freshness:
   automated_checks: false
   check_frequency: "monthly"
-  last_verified: "pending"
+  last_verified: "2026-03-01"
