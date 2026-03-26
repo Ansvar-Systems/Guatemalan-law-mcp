@@ -38,12 +38,12 @@ Este servidor MCP hace que la legislación guatemalteca sea **buscable, referenc
 
 > Connect directly to the hosted version -- zero dependencies, nothing to install.
 
-**Endpoint:** `https://mcp.ansvar.eu/law-guatemalan-law-mcp/mcp`
+**Endpoint:** `https://guatemalan-law-mcp.vercel.app/mcp`
 
 | Client | How to Connect |
 |--------|---------------|
 | **Claude.ai** | Settings > Connectors > Add Integration > paste URL |
-| **Claude Code** | `claude mcp add guatemalan-law --transport http https://mcp.ansvar.eu/law-guatemalan-law-mcp/mcp` |
+| **Claude Code** | `claude mcp add guatemalan-law --transport http https://guatemalan-law-mcp.vercel.app/mcp` |
 | **Claude Desktop** | Add to config (see below) |
 | **GitHub Copilot** | Add to VS Code settings (see below) |
 
@@ -54,7 +54,7 @@ Este servidor MCP hace que la legislación guatemalteca sea **buscable, referenc
   "mcpServers": {
     "guatemalan-law": {
       "type": "url",
-      "url": "https://mcp.ansvar.eu/law-guatemalan-law-mcp/mcp"
+      "url": "https://guatemalan-law-mcp.vercel.app/mcp"
     }
   }
 }
@@ -67,7 +67,7 @@ Este servidor MCP hace que la legislación guatemalteca sea **buscable, referenc
   "github.copilot.chat.mcp.servers": {
     "guatemalan-law": {
       "type": "http",
-      "url": "https://mcp.ansvar.eu/law-guatemalan-law-mcp/mcp"
+      "url": "https://guatemalan-law-mcp.vercel.app/mcp"
     }
   }
 }
