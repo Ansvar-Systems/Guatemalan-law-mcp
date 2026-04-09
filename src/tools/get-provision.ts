@@ -1,5 +1,5 @@
 /**
- * get_provision — Retrieve specific provision(s) from a Dominican statute.
+ * get_provision — Retrieve specific provision(s) from a Guatemalan statute.
  */
 
 import type Database from '@ansvar/mcp-sqlite';
@@ -34,10 +34,11 @@ export async function getProvision(
   if (!resolvedId) {
     return {
       results: [],
-      _metadata: {
+      _meta: {
         ...generateResponseMetadata(db),
-        ...{ note: `No document found matching "${input.document_id}"` },
+        note: `No document found matching "${input.document_id}"`,
       },
+      _error_type: 'not_found',
     };
   }
 
@@ -45,7 +46,7 @@ export async function getProvision(
     'SELECT id, title, url FROM legal_documents WHERE id = ?'
   ).get(resolvedId) as { id: string; title: string; url: string | null } | undefined;
   if (!docRow) {
-    return { results: [], _metadata: generateResponseMetadata(db) };
+    return { results: [], _meta: generateResponseMetadata(db) };
   }
 
   // Specific provision lookup
@@ -59,7 +60,7 @@ export async function getProvision(
       'SELECT * FROM legal_provisions WHERE document_id = ? AND provision_ref = ?'
     ).get(resolvedId, refTrimmed) as Record<string, unknown> | undefined;
 
-    // Try with "s" prefix (e.g., "1" -> "s1") — Dominican "Section" convention
+    // Try with "s" prefix (e.g., "1" -> "s1")
     if (!provision) {
       provision = db.prepare(
         'SELECT * FROM legal_provisions WHERE document_id = ? AND provision_ref = ?'
@@ -100,7 +101,7 @@ export async function getProvision(
           article_number: String(provision.provision_ref).replace(/^(?:s|art)/, ''),
           url: docRow.url ?? undefined,
         }],
-        _metadata: generateResponseMetadata(db),
+        _meta: generateResponseMetadata(db),
         _citation: buildProvisionCitation(
           resolvedId,
           docRow.title,
@@ -115,10 +116,11 @@ export async function getProvision(
 
     return {
       results: [],
-      _metadata: {
+      _meta: {
         ...generateResponseMetadata(db),
-        ...{ note: `Provision "${ref}" not found in document "${resolvedId}"` },
+        note: `Provision "${ref}" not found in document "${resolvedId}"`,
       },
+      _error_type: 'not_found',
     };
   }
 
@@ -139,6 +141,6 @@ export async function getProvision(
       article_number: String(p.provision_ref).replace(/^(?:s|art)/, ''),
       url: docRow.url ?? undefined,
     })),
-    _metadata: generateResponseMetadata(db),
+    _meta: generateResponseMetadata(db),
   };
 }

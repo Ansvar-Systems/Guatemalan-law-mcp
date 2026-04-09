@@ -1,5 +1,5 @@
 /**
- * check_currency — Check whether a Dominican statute is currently in force.
+ * check_currency — Check whether a Guatemalan statute is currently in force.
  */
 
 import type Database from '@ansvar/mcp-sqlite';
@@ -36,7 +36,8 @@ export async function checkCurrency(
         in_force_date: null,
         warnings: [`Document not found: "${input.document_id}"`],
       },
-      _metadata: generateResponseMetadata(db),
+      _meta: generateResponseMetadata(db),
+      _error_type: 'not_found',
     };
   }
 
@@ -68,6 +69,6 @@ export async function checkCurrency(
       in_force_date: doc.in_force_date,
       warnings,
     },
-    _metadata: generateResponseMetadata(db),
+    _meta: generateResponseMetadata(db),
   };
 }
