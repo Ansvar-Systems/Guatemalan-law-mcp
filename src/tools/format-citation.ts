@@ -9,6 +9,7 @@
 
 import type Database from '@ansvar/mcp-sqlite';
 import { resolveDocumentId } from '../utils/statute-id.js';
+import { generateResponseMetadata, type ToolResponse } from '../utils/metadata.js';
 
 export interface FormatCitationInput {
   citation: string;
@@ -38,7 +39,7 @@ function shortenLawTitle(title: string): string {
 export async function formatCitationTool(
   db: InstanceType<typeof Database>,
   input: FormatCitationInput,
-): Promise<FormatCitationResult> {
+): Promise<ToolResponse<FormatCitationResult>> {
   const format = input.format ?? 'full';
   const trimmed = input.citation.trim();
 
@@ -79,5 +80,8 @@ export async function formatCitationTool(
       break;
   }
 
-  return { original: input.citation, formatted, format };
+  return {
+    results: { original: input.citation, formatted, format },
+    _meta: generateResponseMetadata(db),
+  };
 }

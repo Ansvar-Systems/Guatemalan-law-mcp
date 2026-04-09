@@ -44,15 +44,14 @@ export async function listSources(
     results: {
       sources: [
         {
-          name: 'Dominican Republic Law',
-          authority: 'National Council for Law Reporting (Dominican Republic Law)',
-          url: 'http://consultoria.gov.do',
+          name: 'Guatemalan Law',
+          authority: 'Centro Nacional de Análisis y Documentación Judicial (CENADOJ)',
+          url: 'https://cenadoj.gob.gt',
           license: 'Government Open Data',
           coverage:
-            'All Acts of Parliament (revised edition), subsidiary legislation, ' +
-            'the Constitution of Dominican Republic (2010), Dominican Republic Gazette notices, and selected case law ' +
-            'from superior courts including the Supreme Court, Court of Appeal, and High Court',
-          languages: ['en', 'sw'],
+            '337 Guatemalan statutes including Código Civil, Código Penal, Código de Comercio, ' +
+            'sourced from Guatemala Justia and CENADOJ',
+          languages: ['es'],
         },
       ],
       database: {
@@ -63,6 +62,6 @@ export async function listSources(
         provision_count: safeCount(db, 'SELECT COUNT(*) as count FROM legal_provisions'),
       },
     },
-    _metadata: generateResponseMetadata(db),
+    _meta: generateResponseMetadata(db),
   };
 }

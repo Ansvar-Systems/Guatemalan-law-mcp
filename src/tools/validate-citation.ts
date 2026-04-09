@@ -1,5 +1,5 @@
 /**
- * validate_citation — Validate a Dominican legal citation against the database.
+ * validate_citation — Validate a Guatemalan legal citation against the database.
  */
 
 import type Database from '@ansvar/mcp-sqlite';
@@ -22,13 +22,13 @@ export interface ValidateCitationResult {
 }
 
 /**
- * Parse a Dominican legal citation.
+ * Parse a Guatemalan legal citation.
  * Supports:
  * - "Section 25, Data Protection Act 2019"
  * - "s 25, Data Protection Act 2019"
  * - "Section 25 of the Data Protection Act, 2019"
  * - "Data Protection Act 2019, Section 25"
- * - "Article 31, Constitution of Dominican Republic 2010"
+ * - "Article 31, Constitution of Guatemala 1993"
  * - Just an Act title
  */
 function parseCitation(citation: string): { documentRef: string; sectionRef?: string } | null {
@@ -84,7 +84,7 @@ export async function validateCitationTool(
         citation: input.citation,
         warnings: ['Could not parse citation format'],
       },
-      _metadata: generateResponseMetadata(db),
+      _meta: generateResponseMetadata(db),
     };
   }
 
@@ -96,7 +96,8 @@ export async function validateCitationTool(
         citation: input.citation,
         warnings: [`Document not found: "${parsed.documentRef}"`],
       },
-      _metadata: generateResponseMetadata(db),
+      _meta: generateResponseMetadata(db),
+      _error_type: 'not_found',
     };
   }
 
@@ -128,7 +129,8 @@ export async function validateCitationTool(
           document_title: doc.title,
           warnings: [...warnings, `Provision "${parsed.sectionRef}" not found in ${doc.title}`],
         },
-        _metadata: generateResponseMetadata(db),
+        _meta: generateResponseMetadata(db),
+        _error_type: 'not_found',
       };
     }
 
@@ -143,7 +145,7 @@ export async function validateCitationTool(
         status: doc.status,
         warnings,
       },
-      _metadata: generateResponseMetadata(db),
+      _meta: generateResponseMetadata(db),
     };
   }
 
@@ -157,6 +159,6 @@ export async function validateCitationTool(
       status: doc.status,
       warnings,
     },
-    _metadata: generateResponseMetadata(db),
+    _meta: generateResponseMetadata(db),
   };
 }
