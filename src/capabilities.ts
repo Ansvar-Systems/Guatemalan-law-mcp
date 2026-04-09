@@ -1,5 +1,5 @@
 /**
- * Runtime capability detection for Dominican Republic Law MCP.
+ * Runtime capability detection for Guatemalan Law MCP.
  * Detects which database tables are available to enable/disable features.
  */
 

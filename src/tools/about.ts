@@ -44,12 +44,12 @@ export function getAbout(db: InstanceType<typeof Database>, context: AboutContex
       eu_references: safeCount(db, 'SELECT COUNT(*) as count FROM eu_references'),
     },
     data_source: {
-      name: 'Dominican Republic Law',
-      authority: 'National Council for Law Reporting',
-      url: 'http://consultoria.gov.do',
+      name: 'Guatemalan Law',
+      authority: 'Centro Nacional de Análisis y Documentación Judicial (CENADOJ)',
+      url: 'https://cenadoj.gob.gt',
       license: 'Government Open Data',
-      jurisdiction: 'KE',
-      languages: ['en', 'sw'],
+      jurisdiction: 'GT',
+      languages: ['es'],
     },
   };
 }
