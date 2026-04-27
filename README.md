@@ -1,15 +1,15 @@
 # Guatemalan Law MCP Server
 
-**The Guatemala Justia alternative for the AI age.**
+**Guatemalan legislation, AI-native and citation-grade.**
 
 [![npm version](https://badge.fury.io/js/@ansvar%2Fguatemalan-law-mcp.svg)](https://www.npmjs.com/package/@ansvar/guatemalan-law-mcp)
 [![MCP Registry](https://img.shields.io/badge/MCP-Registry-blue)](https://registry.modelcontextprotocol.io)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GitHub stars](https://img.shields.io/github/stars/Ansvar-Systems/Guatemalan-law-mcp?style=social)](https://github.com/Ansvar-Systems/Guatemalan-law-mcp)
 [![CI](https://github.com/Ansvar-Systems/Guatemalan-law-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Ansvar-Systems/Guatemalan-law-mcp/actions/workflows/ci.yml)
-[![Status](https://img.shields.io/badge/status-parsing_in_progress-yellow)]()
+[![Status](https://img.shields.io/badge/status-partial_corpus_v1-orange)]()
 
-Query **337 Guatemalan statutes** -- including the Código Civil, Código Penal, Código de Comercio, Ley de Bancos y Grupos Financieros, and more -- directly from Claude, Cursor, or any MCP-compatible client.
+Query the **8 primary national codes and the 1985 Constitution of Guatemala** -- including the Código Civil, Código Penal, Código de Comercio, Código de Trabajo, Código Procesal Penal, Código Tributario, and the Ley Electoral -- directly from Claude, Cursor, or any MCP-compatible client.
 
 If you're building legal tech, compliance tools, or doing Guatemalan legal research, this is your verified reference database.
 
@@ -34,44 +34,9 @@ Este servidor MCP hace que la legislación guatemalteca sea **buscable, referenc
 
 ## Quick Start
 
-### Use Remotely (No Install Needed)
+### Use via Ansvar MCP Gateway (B2B)
 
-> Connect directly to the hosted version -- zero dependencies, nothing to install.
-
-**Endpoint:** `https://mcp.ansvar.eu/law-gt/mcp`
-
-| Client | How to Connect |
-|--------|---------------|
-| **Claude.ai** | Settings > Connectors > Add Integration > paste URL |
-| **Claude Code** | `claude mcp add guatemalan-law --transport http https://mcp.ansvar.eu/law-gt/mcp` |
-| **Claude Desktop** | Add to config (see below) |
-| **GitHub Copilot** | Add to VS Code settings (see below) |
-
-**Claude Desktop** -- add to `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "guatemalan-law": {
-      "type": "url",
-      "url": "https://mcp.ansvar.eu/law-gt/mcp"
-    }
-  }
-}
-```
-
-**GitHub Copilot** -- add to VS Code `settings.json`:
-
-```json
-{
-  "github.copilot.chat.mcp.servers": {
-    "guatemalan-law": {
-      "type": "http",
-      "url": "https://mcp.ansvar.eu/law-gt/mcp"
-    }
-  }
-}
-```
+For multi-jurisdiction legal-research workloads, route through the Ansvar MCP Gateway at `https://gateway.ansvar.eu` (OAuth, paid tier). The gateway exposes this MCP alongside 360+ other regulatory and legal sources behind a single `search` interface.
 
 ### Use Locally (npm)
 
@@ -126,20 +91,34 @@ Una vez conectado, simplemente pregunta de forma natural:
 
 ---
 
-## What's Included
+## Coverage
 
-> **Note:** This release indexes 337 Guatemalan statutes with provision-level parsing in progress. The server infrastructure, all 13 tools, and the full API are operational. Provision search results will expand as parsing completes.
+This MCP serves the 8 primary national codes and the 1985 Constitution of Guatemala from open public sources (WIPO Lex, ILO NATLEX, congreso.gob.gt, un.org, OAS DIL, Spanish Wikisource). It is a partial-corpus (Tier D) product.
 
-| Category | Count | Details |
-|----------|-------|---------|
-| **Statutes** | 337 laws | Guatemalan legislation from Guatemala Justia |
-| **Provisions** | Parsing in progress | Full-text searchable with FTS5 once parsed |
-| **Database Size** | ~0.4 MB (growing) | Will expand as provision parsing completes |
-| **Target Coverage** | Código Civil, Código Penal, Código de Comercio, Código de Trabajo, major regulatory laws | Priority codes parsed first |
+| Instrument | Source | Articles |
+|---|---|---|
+| Constitución Política 1985 | Spanish Wikisource | ~280 |
+| Código Penal (Decreto 17-73) | UN DOALOS | ~500 |
+| Código Procesal Penal (Decreto 51-92) | IDPP biblioteca virtual | ~555 |
+| Código Civil (Decreto-Ley 106) | OAS DIL | ~2,090 |
+| Código de Trabajo (Decreto 1441) | WIPO Lex (via Internet Archive) | ~415 |
+| Código de Comercio (Decreto 2-70) | WIPO Lex (via Internet Archive) | ~1,225 |
+| Código Tributario (Decreto-Ley 6-91) | Spanish Wikisource | ~190 |
+| Ley Electoral (Decreto 1-85) | Spanish Wikisource | ~280 |
 
-**What's operational now:** All 13 tools respond correctly. `list_sources` returns all 337 statutes. `check_currency` and `validate_citation` work against current database state. Provision search and retrieval expand as parsing completes.
+**Total:** 8 documents, 5,500+ provisions, 80+ definitions. All instruments are tagged `confidence_tier: blue` (text-layered primary sources, no OCR).
 
-**Verified data only** -- every citation is validated against official sources (guatemala.justia.com). Zero LLM-generated content.
+### NOT covered
+
+- **The official consolidated gazette (oj.gob.gt / CENADOJ)** -- geo-gated to Guatemalan IPs and not accessible from our infrastructure. Customers requiring authoritative consolidated text including amendments not reflected in our snapshots should consult CENADOJ directly.
+- **Case law** (Corte de Constitucionalidad, Corte Suprema de Justicia jurisprudence).
+- **Agency guidance / regulatory opinions.**
+- **Decree-level instruments outside the 8 listed codes.**
+- **Subnational regulation, municipal codes.**
+
+**Snapshot date:** Each instrument is dated to its retrieval source; consolidated amendments after that date are NOT applied. Verify against CENADOJ for litigation-grade use.
+
+**Verified data only** -- every citation is validated against the source documents listed above. Zero LLM-generated content.
 
 ---
 
@@ -148,7 +127,7 @@ Una vez conectado, simplemente pregunta de forma natural:
 ### Why This Works
 
 **Verbatim Source Text (No LLM Processing):**
-- All statute text is ingested from Guatemala Justia (guatemala.justia.com), which mirrors official Guatemalan legislative publications
+- All statute text is ingested from open public sources (see [`sources.yml`](./sources.yml))
 - Provisions are returned **unchanged** from SQLite FTS5 database rows
 - Zero LLM summarization or paraphrasing -- the database contains legislation text, not AI interpretations
 
@@ -159,23 +138,23 @@ Una vez conectado, simplemente pregunta de forma natural:
 
 **Technical Architecture:**
 ```
-Guatemala Justia --> Parse --> SQLite --> FTS5 snippet() --> MCP response
-                      ^                        ^
-               Provision parser         Verbatim database query
+Open public sources --> Parse --> SQLite --> FTS5 snippet() --> MCP response
+       ^                              ^
+Wikitext / PDF parsers          Verbatim database query
 ```
 
 ### Traditional Research vs. This MCP
 
 | Traditional Approach | This MCP Server |
 |---------------------|-----------------|
-| Search Guatemala Justia by statute name | Search by plain Spanish: *"contrato compraventa"* |
+| Search by statute name across multiple PDFs | Search by plain Spanish: *"contrato compraventa"* |
 | Navigate multi-article codes manually | Get the exact provision with context |
 | Manual cross-referencing between laws | `build_legal_stance` aggregates across sources |
 | "¿Está vigente esta ley?" -- check manually | `check_currency` tool -- answer in seconds |
 | Find OAS/SICA basis -- dig through documents | `get_eu_basis` -- linked frameworks instantly |
 | No API, no integration | MCP protocol -- AI-native |
 
-**Traditional:** Search Guatemala Justia --> Download PDF --> Ctrl+F --> Cross-reference with Diario de Centro América --> Verify with CENADOJ --> Repeat
+**Traditional:** Search portals --> Download PDF --> Ctrl+F --> Cross-reference with Diario de Centro América --> Verify with CENADOJ --> Repeat
 
 **This MCP:** *"¿Cuáles son los requisitos para constituir una sociedad anónima en Guatemala según el Código de Comercio?"* --> Done.
 
@@ -193,7 +172,7 @@ Guatemala Justia --> Parse --> SQLite --> FTS5 snippet() --> MCP response
 | `validate_citation` | Validate citation against database -- zero-hallucination check |
 | `build_legal_stance` | Aggregate citations from multiple statutes for a legal topic |
 | `format_citation` | Format citations per Guatemalan legal conventions (full/short/pinpoint) |
-| `list_sources` | List all 337 available statutes with metadata, coverage scope, and data provenance |
+| `list_sources` | List the 8 ingested instruments with metadata, coverage scope, and data provenance |
 | `about` | Server info, capabilities, dataset statistics, and coverage summary |
 
 ### International Law Integration Tools (5)
@@ -226,19 +205,23 @@ The international alignment tools allow you to explore these relationships -- ch
 
 ## Data Sources & Freshness
 
-All content is sourced from authoritative Guatemalan legal databases:
+All content is sourced from open public legal databases. See [`sources.yml`](./sources.yml) for the full per-instrument provenance record (authority, retrieval method, license).
 
-- **[Guatemala Justia](https://guatemala.justia.com/)** -- Comprehensive mirror of Guatemalan official legislation
+- **Spanish Wikisource** -- Constitución 1985, Código Tributario, Ley Electoral
+- **UN DOALOS** -- Código Penal
+- **OAS DIL** -- Código Civil
+- **IDPP biblioteca virtual** -- Código Procesal Penal
+- **WIPO Lex (via Internet Archive)** -- Código de Trabajo, Código de Comercio
 
 ### Data Provenance
 
 | Field | Value |
 |-------|-------|
-| **Authority** | Congreso de la República de Guatemala (via Guatemala Justia) |
-| **Retrieval method** | Structured scrape from guatemala.justia.com |
+| **Authority** | Congreso de la República de Guatemala (texts in the public domain) |
+| **Retrieval method** | Per-source: MediaWiki `action=raw` for Wikisource entries; direct PDF download elsewhere |
 | **Language** | Spanish |
-| **Coverage** | 337 Guatemalan statutes |
-| **Database size** | ~0.4 MB (growing as parsing completes) |
+| **Coverage** | 8 primary national codes + 1985 Constitution (Tier D partial corpus) |
+| **Confidence tier** | All provisions tagged `blue` (text-layered primary sources, no OCR) |
 
 ### Automated Freshness Checks
 
@@ -279,13 +262,13 @@ See [SECURITY.md](SECURITY.md) for the full policy and vulnerability reporting.
 
 > **THIS TOOL IS NOT LEGAL ADVICE**
 >
-> Statute text is sourced from Guatemala Justia, which mirrors official Guatemalan legislative publications. However:
+> Statute text is sourced from open public publications of Guatemalan legislation (see `sources.yml` for per-instrument provenance). However:
 > - This is a **research tool**, not a substitute for professional legal counsel
 > - **Court case coverage is not included** -- do not rely solely on this for case law research
-> - **Verify critical citations** against the Diario de Centro América for court filings
+> - **Verify critical citations** against the Diario de Centro América / CENADOJ for court filings
 > - **International cross-references** reflect alignment relationships, not direct transposition
-> - **Municipal regulations and reglamentos** are not included -- this covers national statutes only
-> - **Provision parsing is in progress** -- some statutes may have incomplete provision coverage
+> - **Municipal regulations and reglamentos** are not included -- this covers the 8 priority national codes plus the 1985 Constitution
+> - **Each instrument is dated to its retrieval source** -- consolidated amendments published after that date are not applied
 
 For professional legal advice in Guatemala, consult a member of the **Colegio de Abogados y Notarios de Guatemala**.
 
@@ -319,17 +302,19 @@ npx @anthropic/mcp-inspector node dist/src/index.js   # Test with MCP Inspector
 ### Data Management
 
 ```bash
-npm run ingest          # Ingest statutes from Guatemala Justia
-npm run build:db        # Rebuild SQLite database
+npm run census          # Seed data/census.json from scripts/lib/sources.ts
+npm run ingest          # Fetch and parse the 8 primary instruments
+npm run ingest -- --source-id codigo-penal-17-73   # Ingest one instrument
+npm run ingest -- --force                          # Re-ingest all
+npm run build:db        # Rebuild SQLite database from data/seed/*.json
 npm run drift:detect    # Run drift detection against anchors
 npm run check-updates   # Check for amendments and new statutes
-npm run census          # Generate coverage census
 ```
 
 ### Performance
 
 - **Search Speed:** <100ms for most FTS5 queries
-- **Reliability:** Designed for 100% ingestion success rate across 337 statutes
+- **Reliability:** All 8 priority instruments verified end-to-end on each ingest run
 
 ---
 
@@ -358,24 +343,22 @@ This server is part of **Ansvar's Compliance Suite** -- MCP servers that work to
 Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 Priority areas:
-- Provision parsing completion for all 337 statutes
 - Court case law (Corte de Constitucionalidad decisions)
-- CENADOJ full-text integration
+- CENADOJ full-text integration (currently blocked by IP geo-gating)
 - Historical statute versions and amendment tracking
+- Decree-level instruments outside the 8 priority codes
 
 ---
 
 ## Roadmap
 
-- [x] Core statute index (337 statutes)
 - [x] Server infrastructure and all 13 tools
 - [x] International law alignment tools
-- [x] Vercel Streamable HTTP deployment
-- [x] npm package publication
-- [ ] Provision parsing completion
+- [x] Partial-corpus v1: 8 primary codes + 1985 Constitution (5,500+ provisions)
 - [ ] Court case law (Corte de Constitucionalidad)
-- [ ] CENADOJ full-text integration
+- [ ] CENADOJ full-text integration (blocked by IP geo-gating)
 - [ ] Historical statute versions (amendment tracking)
+- [ ] Decree-level instruments outside the 8 priority codes
 
 ---
 
@@ -389,7 +372,7 @@ If you use this MCP server in academic research:
   title = {Guatemalan Law MCP Server: AI-Powered Legal Research Tool},
   year = {2026},
   url = {https://github.com/Ansvar-Systems/Guatemalan-law-mcp},
-  note = {337 Guatemalan statutes with international law alignment (provision parsing in progress)}
+  note = {Partial-corpus (Tier D) covering 8 primary national codes and the 1985 Constitution; CENADOJ consolidated gazette is geo-gated and out of scope}
 }
 ```
 
@@ -401,7 +384,7 @@ Apache License 2.0. See [LICENSE](./LICENSE) for details.
 
 ### Data Licenses
 
-- **Statutes & Legislation:** Guatemalan Government (public domain via Guatemala Justia)
+- **Statutes & Legislation:** Guatemalan Government (public domain); Wikisource entries additionally licensed CC BY-SA 4.0
 - **International Metadata:** OAS, SICA (public domain)
 
 ---

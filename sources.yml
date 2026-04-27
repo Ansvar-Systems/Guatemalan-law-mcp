@@ -2,31 +2,167 @@
 schema_version: "1.0"
 mcp_name: "Guatemala Law MCP"
 jurisdiction: "GT"
+coverage_tier: "D"
+
+# Partial-corpus v1: 8 primary national codes plus the 1985 Constitution,
+# fetched from open public sources. The official consolidated gazette
+# (CENADOJ / oj.gob.gt) is geo-gated to Guatemalan IPs and is excluded
+# from this corpus by infrastructure constraint, not by choice.
 
 sources:
-  - name: "Justia Guatemala"
-    authority: "Justia (mirrors Guatemala official legislation)"
-    official_portal: "https://guatemala.justia.com"
-    canonical_identifier: "gt-law"
-    retrieval_method: "HTML scraping"
-    api_documentation: "N/A"
-    update_frequency: "As laws are enacted"
-    last_ingested: "2026-03-01"
+  - name: "Spanish Wikisource — Constitución 1985"
+    authority: "Wikimedia Foundation (community-curated)"
+    official_portal: "https://es.wikisource.org/wiki/Constituci%C3%B3n_Pol%C3%ADtica_de_la_Rep%C3%BAblica_de_Guatemala_de_1985"
+    canonical_identifier: "constitucion-1985"
+    retrieval_method: "MediaWiki action=raw"
+    api_documentation: "https://www.mediawiki.org/wiki/API:Main_page"
+    update_frequency: "On amendment publication (community-edited)"
+    last_ingested: "2026-04-27"
     license_or_terms:
-      type: "Government Publication"
-      url: "https://guatemala.justia.com"
-      summary: "Justia mirrors official Guatemalan legislation; legislation is public domain as government publication"
+      type: "Creative Commons Attribution-ShareAlike 4.0"
+      url: "https://creativecommons.org/licenses/by-sa/4.0/"
+      summary: "Spanish Wikisource is licensed under CC BY-SA 4.0; the underlying constitutional text is a Guatemalan government publication and in the public domain."
     coverage:
-      scope: "National laws, decrees, and declarations"
-      categories:
-        - "leyes (national laws)"
-        - "decretos (decrees)"
-        - "declaratorias (declarations)"
-      limitations: "Coverage depends on Justia mirror completeness"
+      scope: "Constitución Política de la República de Guatemala (1985, including 1993 reforms)"
+      limitations: "Snapshot date dependent on Wikisource page revision; verify against Diario de Centro América for litigation use."
+    languages:
+      - "es"
+
+  - name: "United Nations DOALOS — Código Penal"
+    authority: "UN Office of Legal Affairs, Division for Ocean Affairs and the Law of the Sea"
+    official_portal: "https://www.un.org/depts/los/LEGISLATIONANDTREATIES/PDFFILES/GTM_codigo_penal.pdf"
+    canonical_identifier: "codigo-penal-17-73"
+    retrieval_method: "Direct PDF download"
+    api_documentation: "N/A"
+    update_frequency: "Static snapshot (DOALOS legislation archive)"
+    last_ingested: "2026-04-27"
+    license_or_terms:
+      type: "Government Open Data"
+      url: "https://www.un.org/Depts/los/"
+      summary: "Guatemalan statute deposited with UN DOALOS; underlying text is a Guatemalan government publication and in the public domain."
+    coverage:
+      scope: "Código Penal de Guatemala (Decreto 17-73)"
+      limitations: "Reflects DOALOS archive snapshot; amendments enacted after the snapshot are not applied."
+    languages:
+      - "es"
+
+  - name: "Instituto de la Defensa Pública Penal — Código Procesal Penal"
+    authority: "Instituto de la Defensa Pública Penal de Guatemala (IDPP)"
+    official_portal: "https://www.idpp.gob.gt/images/Biblioteca-virtual/Leyes_y_Reglamentos/CODIGO_PROCESAL_PENAL.pdf"
+    canonical_identifier: "codigo-procesal-penal-51-92"
+    retrieval_method: "Direct PDF download"
+    api_documentation: "N/A"
+    update_frequency: "On revision by IDPP (manual)"
+    last_ingested: "2026-04-27"
+    license_or_terms:
+      type: "Government Open Data"
+      url: "https://www.idpp.gob.gt/"
+      summary: "Published by the Guatemalan public defender's office; the underlying code is a public-domain government publication."
+    coverage:
+      scope: "Código Procesal Penal de Guatemala (Decreto 51-92)"
+      limitations: "Reflects the IDPP biblioteca-virtual snapshot."
+    languages:
+      - "es"
+
+  - name: "OAS DIL — Código Civil"
+    authority: "Organization of American States, Department of International Law"
+    official_portal: "https://www.oas.org/dil/esp/Codigo_Civil_Guatemala.pdf"
+    canonical_identifier: "codigo-civil-106"
+    retrieval_method: "Direct PDF download"
+    api_documentation: "N/A"
+    update_frequency: "Static snapshot (OAS legislation archive)"
+    last_ingested: "2026-04-27"
+    license_or_terms:
+      type: "OAS Public Document"
+      url: "https://www.oas.org/dil/"
+      summary: "OAS Department of International Law publishes member-state legislation as public documents; the underlying text is a Guatemalan public-domain government publication."
+    coverage:
+      scope: "Código Civil de Guatemala (Decreto-Ley 106)"
+      limitations: "Used as the access route because the WIPO Lex page intermittently returns 504. Reflects OAS DIL snapshot; amendments after the snapshot are not applied."
+    languages:
+      - "es"
+
+  - name: "WIPO Lex (via Internet Archive) — Código de Trabajo"
+    authority: "World Intellectual Property Organization (WIPO Lex)"
+    official_portal: "https://www.wipo.int/wipolex/en/legislation/details/2023"
+    canonical_identifier: "codigo-trabajo-1441"
+    retrieval_method: "Wayback Machine snapshot of WIPO Lex CDN"
+    api_documentation: "N/A"
+    update_frequency: "Static snapshot"
+    last_ingested: "2026-04-27"
+    license_or_terms:
+      type: "Government Open Data"
+      url: "https://www.wipo.int/wipolex/en/disclaimer.html"
+      summary: "WIPO Lex publishes member-state legislation; the underlying labour code is a public-domain Guatemalan government publication. Snapshot served via Internet Archive because the live WIPO Lex CDN intermittently returns 504."
+    coverage:
+      scope: "Código de Trabajo de Guatemala (Decreto 1441)"
+      limitations: "Two-column annotated edition (Mintrabajo / ASIES). Article-extraction fidelity is lower than other PDFs (~99% of expected articles); marginal annotations may bleed into provision text. Cross-reference with the official Mintrabajo edition for litigation use."
+    languages:
+      - "es"
+
+  - name: "WIPO Lex (via Internet Archive) — Código de Comercio"
+    authority: "World Intellectual Property Organization (WIPO Lex)"
+    official_portal: "https://www.wipo.int/wipolex/es/legislation/details/2014"
+    canonical_identifier: "codigo-comercio-2-70"
+    retrieval_method: "Wayback Machine snapshot of WIPO Lex CDN"
+    api_documentation: "N/A"
+    update_frequency: "Static snapshot"
+    last_ingested: "2026-04-27"
+    license_or_terms:
+      type: "Government Open Data"
+      url: "https://www.wipo.int/wipolex/en/disclaimer.html"
+      summary: "WIPO Lex publishes member-state legislation; the underlying commercial code is a public-domain Guatemalan government publication. Snapshot served via Internet Archive because congreso.gob.gt blocks non-Guatemalan IPs (Imperva WAF) and the live WIPO Lex CDN intermittently returns 504."
+    coverage:
+      scope: "Código de Comercio de Guatemala (Decreto 2-70)"
+      limitations: "Reflects the WIPO Lex snapshot; amendments after the snapshot are not applied."
+    languages:
+      - "es"
+
+  - name: "Spanish Wikisource — Código Tributario"
+    authority: "Wikimedia Foundation (community-curated)"
+    official_portal: "https://es.wikisource.org/wiki/C%C3%B3digo_Tributario_de_la_Rep%C3%BAblica_de_Guatemala_(Decreto_Ley_6-91)"
+    canonical_identifier: "codigo-tributario-6-91"
+    retrieval_method: "MediaWiki action=raw"
+    api_documentation: "https://www.mediawiki.org/wiki/API:Main_page"
+    update_frequency: "On amendment publication (community-edited)"
+    last_ingested: "2026-04-27"
+    license_or_terms:
+      type: "Creative Commons Attribution-ShareAlike 4.0"
+      url: "https://creativecommons.org/licenses/by-sa/4.0/"
+      summary: "Spanish Wikisource is licensed under CC BY-SA 4.0; the underlying tax code is a public-domain Guatemalan government publication."
+    coverage:
+      scope: "Código Tributario de la República de Guatemala (Decreto-Ley 6-91)"
+      limitations: "Wikisource explicitly disclaims legal-currency guarantees; verify against SAT for litigation use."
+    languages:
+      - "es"
+
+  - name: "Spanish Wikisource — Ley Electoral y de Partidos Políticos"
+    authority: "Wikimedia Foundation (community-curated)"
+    official_portal: "https://es.wikisource.org/wiki/Decreto_N%C3%BAmero_1-85,_Ley_Electoral_y_de_Partidos_Pol%C3%ADticos_(Guatemala)"
+    canonical_identifier: "ley-electoral-1-85"
+    retrieval_method: "MediaWiki action=raw"
+    api_documentation: "https://www.mediawiki.org/wiki/API:Main_page"
+    update_frequency: "On amendment publication (community-edited)"
+    last_ingested: "2026-04-27"
+    license_or_terms:
+      type: "Creative Commons Attribution-ShareAlike 4.0"
+      url: "https://creativecommons.org/licenses/by-sa/4.0/"
+      summary: "Spanish Wikisource is licensed under CC BY-SA 4.0; the underlying electoral law is a public-domain Guatemalan government publication."
+    coverage:
+      scope: "Ley Electoral y de Partidos Políticos (Decreto Número 1-85, with later reforms)"
+      limitations: "Wikisource explicitly disclaims legal-currency guarantees; verify against TSE for litigation use."
     languages:
       - "es"
 
 data_freshness:
   automated_checks: false
   check_frequency: "monthly"
-  last_verified: "2026-03-01"
+  last_verified: "2026-04-27"
+
+not_covered:
+  - "Official consolidated gazette (CENADOJ / oj.gob.gt) — geo-gated to Guatemalan IPs"
+  - "Case law (Corte de Constitucionalidad, Corte Suprema de Justicia jurisprudence)"
+  - "Agency guidance / regulatory opinions"
+  - "Decree-level instruments outside the 8 listed codes"
+  - "Subnational regulation, municipal codes"
+  - "Amendments published after each instrument snapshot date"

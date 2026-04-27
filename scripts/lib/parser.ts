@@ -35,6 +35,10 @@ export interface ParsedProvision {
   section: string;
   title: string;
   content: string;
+  metadata?: {
+    confidence_tier?: 'blue' | 'amber';
+    [key: string]: unknown;
+  };
 }
 
 export interface ParsedDefinition {
@@ -111,7 +115,7 @@ function htmlToText(html: string): string {
  *   Articulo Unico
  */
 const ARTICLE_PATTERNS = [
-  /(?:^|\n)\s*(?:ART[ÍI]CULO|Art[íi]culo|ARTICULO|ART\.?)\s+((?:\d+[\s.]*(?:bis|ter)?|\d+[A-Z]?(?:\.\d+)?|[ÚU]NICO|[ÚU]nico|UNICO))\s*[.°º]*[-.:–]?\s*([^\n]*)/gimu,
+  /(?:^|\n)\s*(?:ART[ÍI]CULO|Art[íi]culo|ARTICULO|ART\.?)\s+((?:\d+[\s.]*(?:bis|ter)?|\d+[A-Z]?(?:\.\d+)?|[ÚU]NICO|[ÚU]nico|UNICO))\s*(?:[oOªº°]\.?)?\s*[.°º]*[-.:–]?\s*([^\n]*)/gimu,
 ];
 
 const STRUCTURE_RE = /(?:^|\n)\s*((?:T[ÍI]TULO|TITULO|CAP[ÍI]TULO|CAPITULO|SECCI[ÓO]N|SECCION|DISPOSICION(?:ES)?(?:\s+(?:TRANSITORIAS?|FINALES?|DEROGATORIAS?|GENERALES?|COMPLEMENTARIAS?))?)\s+[IVXLC0-9]+[^\n]*)/gimu;
@@ -282,6 +286,146 @@ export function parseGTLawText(text: string, act: ActIndexEntry): ParsedAct {
     provisions,
     definitions,
   };
+}
+
+/* ---------- Wikitext parsing ---------- */
+
+/**
+ * Strip MediaWiki markup down to plain text while keeping article and
+ * structural headings detectable by ARTICLE_PATTERNS / STRUCTURE_RE.
+ *
+ * We preserve text inside bold quotes ('''...''') which is how Wikisource
+ * marks article headings on the Guatemala statutes. <ref>...</ref>
+ * footnotes (cross-references to amendments) are stripped because they
+ * would otherwise pollute the article body.
+ */
+function wikitextToText(wikitext: string): string {
+  let t = wikitext;
+
+  t = t.replace(/<ref\b[^>]*\/>/gi, '');
+  t = t.replace(/<ref\b[^>]*>[\s\S]*?<\/ref>/gi, '');
+
+  t = t.replace(/<!--[\s\S]*?-->/g, '');
+
+  t = t.replace(/<\/?(span|center|small|big|sup|sub|u|s|strike|font|div|td|tr|table|tbody|thead|tfoot|noinclude|includeonly|onlyinclude|abbr|cite|code|pre|nowiki|gallery|imagemap|poem|references)\b[^>]*>/gi, '');
+  t = t.replace(/<br\s*\/?\s*>/gi, '\n');
+
+  t = t.replace(/\{\{[^{}\n]*\}\}/g, '');
+  t = t.replace(/\{\{[\s\S]*?\}\}/g, '');
+
+  t = t.replace(/\[\[(?:[^|\]]+\|)?([^\]]+)\]\]/g, '$1');
+  t = t.replace(/\[https?:\/\/\S+\s+([^\]]+)\]/g, '$1');
+  t = t.replace(/\[https?:\/\/\S+\]/g, '');
+
+  t = t.replace(/__[A-Z]+__/g, '');
+
+  t = t.replace(/'''([^']+)'''/g, '$1');
+  t = t.replace(/''([^']+)''/g, '$1');
+
+  t = t.replace(/(^|\n)={2,6}\s*([^=\n]+?)\s*={2,6}\s*$/gm, (_, lead, body) => {
+    return `${lead}== ${body.trim()} ==`;
+  });
+
+  t = t.replace(/(^|\n)[*#:;]+\s*/g, '$1');
+
+  t = t.replace(/&nbsp;/g, ' ');
+  t = decodeEntities(t);
+
+  t = t.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  t = t.replace(/[ \t]+/g, ' ');
+  t = t.replace(/ +\n/g, '\n').replace(/\n +/g, '\n');
+  t = t.replace(/\n{3,}/g, '\n\n');
+
+  return t.trim();
+}
+
+/**
+ * Parse Wikisource Spanish-language wikitext for a Guatemalan statute.
+ *
+ * Articles are typically marked as `'''Artículo N.'''` or
+ * `'''ARTICULO Nº.-'''` after wikitextToText flattens them to plain
+ * `Artículo N.` markers, which ARTICLE_PATTERNS handles.
+ */
+export function parseGTLawWikitext(wikitext: string, act: ActIndexEntry): ParsedAct {
+  const text = wikitextToText(wikitext);
+  return parseGTLawText(text, act);
+}
+
+/* ---------- PDF text-layer parsing ---------- */
+
+/**
+ * Strip page-header / page-footer noise that repeats every page in PDF
+ * extractions. We use simple frequency-based heuristics — a short line
+ * that appears more than 5 times across the document is treated as a
+ * page chrome line and removed.
+ */
+/**
+ * Normalize PDF font-substitution glyphs back to Spanish characters.
+ *
+ * The Guatemala labour-code PDF (mintrabajo edition mirrored on WIPO Lex)
+ * substitutes the digraph "tí" with U+01A1 (ơ), and "fi"/"ti" with other
+ * private-use glyphs. Without this normalisation, "Artículo" becomes
+ * "Arơculo" and the article patterns never match.
+ */
+function normalizePdfLigatures(text: string): string {
+  return text
+    .replace(/Arơculo/g, 'Artículo')
+    .replace(/arơculo/g, 'artículo')
+    .replace(/ơ/g, 'tí')
+    .replace(/ﬀ/g, 'ff')
+    .replace(/ﬁ/g, 'fi')
+    .replace(/ﬂ/g, 'fl')
+    .replace(/ﬃ/g, 'ffi')
+    .replace(/ﬄ/g, 'ffl');
+}
+
+function stripPdfChrome(text: string): string {
+  const lines = text.split('\n');
+  const counts = new Map<string, number>();
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (line.length === 0 || line.length > 80) continue;
+    if (/^\d+$/.test(line)) {
+      counts.set('__pagenum__', (counts.get('__pagenum__') ?? 0) + 1);
+      continue;
+    }
+    counts.set(line, (counts.get(line) ?? 0) + 1);
+  }
+
+  const noise = new Set<string>();
+  for (const [line, count] of counts.entries()) {
+    if (line === '__pagenum__') continue;
+    if (count >= 5 && line.length <= 80) noise.add(line);
+  }
+
+  const cleaned: string[] = [];
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (/^\d{1,4}$/.test(line)) continue;
+    if (noise.has(line)) continue;
+    cleaned.push(raw);
+  }
+
+  return cleaned.join('\n');
+}
+
+/**
+ * Parse pdftotext output for a Guatemalan statute.
+ *
+ * Article headers vary across the corpus:
+ *   - `ARTICULO 1.`     (Penal Code, UN scan — uppercase, no accent)
+ *   - `Artículo 1.-`    (Procesal Penal, IDPP — mixed case, accent)
+ *   - `ARTICULO 1.-`    (Civil Code, OAS — uppercase, no accent, dash)
+ *
+ * ARTICLE_PATTERNS already handles these via the case-insensitive
+ * `(?:ART[ÍI]CULO|Art[íi]culo|ARTICULO|ART\.?)` group. We only need to
+ * clean up page chrome before delegating to parseGTLawText.
+ */
+export function parseGTLawPdfText(text: string, act: ActIndexEntry): ParsedAct {
+  const normalized = normalizePdfLigatures(text);
+  const cleaned = stripPdfChrome(normalized);
+  return parseGTLawText(cleaned, act);
 }
 
 /**
