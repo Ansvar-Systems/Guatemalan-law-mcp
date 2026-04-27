@@ -5,6 +5,8 @@ jurisdiction: "GT"
 
 sources:
   - name: "Justia Guatemala"
+    status: "blocked"
+    blocked_reason: "Justia serves scanned PDFs in iframes — no parseable provisions extractable. Verified 2026-03-01 and 2026-04-27."
     authority: "Justia (mirrors Guatemala official legislation)"
     official_portal: "https://guatemala.justia.com"
     canonical_identifier: "gt-law"
@@ -26,7 +28,20 @@ sources:
     languages:
       - "es"
 
+  - name: "CENADOJ — Centro Nacional de Análisis y Documentación Judicial"
+    status: "deferred_probe"
+    deferred_reason: "oj.gob.gt verified unreachable from base network on 2026-04-27 (HTTP returns IIS 404 with empty body for every probed path; HTTPS port 443 refuses connection — likely app-layer geo-gating to GT-source IPs). VPN re-attempt requires a NordVPN subscription which is not currently available."
+    authority: "Organismo Judicial, República de Guatemala"
+    official_portal: "https://oj.gob.gt/cenadoj/"
+    retrieval_method: "PDF_DOWNLOAD via VPN tunnel"
+    license_or_terms:
+      type: "public_record"
+      legal_basis: "Decreto 33-98 art. 68"
+    languages:
+      - "es"
+    next_action: "Subscribe NordVPN, re-run Phase A per docs/superpowers/specs/2026-04-27-guatemala-law-mcp-revival-design.md (architecture-documentation repo). Alternative: partnership outreach to Organismo Judicial. See docs/handover/2026-04-27-guatemala-cenadoj-vpn-attempt.md for full probe outcome."
+
 data_freshness:
   automated_checks: false
   check_frequency: "monthly"
-  last_verified: "2026-03-01"
+  last_verified: "2026-04-27"
