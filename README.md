@@ -1,19 +1,22 @@
 # Guatemalan Law MCP Server
 
-**The Guatemala Justia alternative for the AI age.**
-
-[![npm version](https://badge.fury.io/js/@ansvar%2Fguatemalan-law-mcp.svg)](https://www.npmjs.com/package/@ansvar/guatemalan-law-mcp)
-[![MCP Registry](https://img.shields.io/badge/MCP-Registry-blue)](https://registry.modelcontextprotocol.io)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![GitHub stars](https://img.shields.io/github/stars/Ansvar-Systems/Guatemalan-law-mcp?style=social)](https://github.com/Ansvar-Systems/Guatemalan-law-mcp)
-[![CI](https://github.com/Ansvar-Systems/Guatemalan-law-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Ansvar-Systems/Guatemalan-law-mcp/actions/workflows/ci.yml)
-[![Status](https://img.shields.io/badge/status-parsing_in_progress-yellow)]()
-
-Query **337 Guatemalan statutes** -- including the Código Civil, Código Penal, Código de Comercio, Ley de Bancos y Grupos Financieros, and more -- directly from Claude, Cursor, or any MCP-compatible client.
-
-If you're building legal tech, compliance tools, or doing Guatemalan legal research, this is your verified reference database.
+[![Status](https://img.shields.io/badge/status-deferred__probe-orange)]()
 
 Built by [Ansvar Systems](https://ansvar.eu) -- Stockholm, Sweden
+
+---
+
+## Coverage status
+
+This MCP is currently a placeholder. The corpus is empty (0 provisions) because the canonical source — CENADOJ (Centro Nacional de Análisis y Documentación Judicial, oj.gob.gt) — was verified unreachable from the base network on 2026-04-27 (HTTP returns IIS 404 with empty body, HTTPS port 443 refuses connection — likely application-layer geo-gating to Guatemala-source IPs). Earlier ingest attempts via Justia produced 0 useful provisions (the source serves scanned PDFs in Google Docs Viewer iframes, not parseable HTML).
+
+**Next action:** Subscribe to NordVPN (or another commercial VPN with a Guatemala exit) and re-run Phase A of the revival plan — see `docs/superpowers/specs/2026-04-27-guatemala-law-mcp-revival-design.md` and `docs/handover/2026-04-27-guatemala-cenadoj-vpn-attempt.md` in the architecture-documentation repo. A NordVPN subscription is not currently available, so this MCP is parked at `deferred_probe` until that changes. Alternative path: partnership outreach to the Organismo Judicial.
+
+For Latin American civil-law research while this MCP is dormant, the closest fleet alternatives are:
+
+- **Mexican Law MCP** (`@ansvar/mexican-law-mcp`) — civil-law family, comparable code structure
+- **Costa Rican Law MCP** (`@ansvar/costa-rican-law-mcp`) — Central American regional
 
 ---
 
@@ -128,18 +131,14 @@ Una vez conectado, simplemente pregunta de forma natural:
 
 ## What's Included
 
-> **Note:** This release indexes 337 Guatemalan statutes with provision-level parsing in progress. The server infrastructure, all 13 tools, and the full API are operational. Provision search results will expand as parsing completes.
+> **Note:** Corpus is currently empty (deferred_probe — see "Coverage status" above). The server infrastructure and all 13 tools respond, but search returns 0 provisions. The 337-statute index from Justia produced 0 parseable provisions. Re-ingestion from CENADOJ is gated on VPN access to Guatemala exit IPs.
 
 | Category | Count | Details |
 |----------|-------|---------|
-| **Statutes** | 337 laws | Guatemalan legislation from Guatemala Justia |
-| **Provisions** | Parsing in progress | Full-text searchable with FTS5 once parsed |
-| **Database Size** | ~0.4 MB (growing) | Will expand as provision parsing completes |
-| **Target Coverage** | Código Civil, Código Penal, Código de Comercio, Código de Trabajo, major regulatory laws | Priority codes parsed first |
-
-**What's operational now:** All 13 tools respond correctly. `list_sources` returns all 337 statutes. `check_currency` and `validate_citation` work against current database state. Provision search and retrieval expand as parsing completes.
-
-**Verified data only** -- every citation is validated against official sources (guatemala.justia.com). Zero LLM-generated content.
+| **Statutes** | 337 (index only) | Justia-mirrored list; 0 useful provisions extracted |
+| **Provisions** | 0 | Justia served scanned PDFs in iframes; CENADOJ unreachable |
+| **Database Size** | ~0.4 MB (placeholder) | Empty corpus; will rebuild on Phase A re-run |
+| **Target Coverage** | 5 main codes — Civil, Penal, Comercio, Trabajo, Procesal Civil + Procesal Penal | Pending CENADOJ access |
 
 ---
 
@@ -226,31 +225,12 @@ The international alignment tools allow you to explore these relationships -- ch
 
 ## Data Sources & Freshness
 
-All content is sourced from authoritative Guatemalan legal databases:
+See **`sources.yml`** for the canonical source registry. Current state:
 
-- **[Guatemala Justia](https://guatemala.justia.com/)** -- Comprehensive mirror of Guatemalan official legislation
+- **Guatemala Justia** (`https://guatemala.justia.com`) — `status: blocked`. Serves scanned PDFs via iframes; produced 0 parseable provisions.
+- **CENADOJ** (`https://oj.gob.gt/cenadoj/`) — `status: deferred_probe`. Verified unreachable from the base network on 2026-04-27. Pending VPN re-attempt.
 
-### Data Provenance
-
-| Field | Value |
-|-------|-------|
-| **Authority** | Congreso de la República de Guatemala (via Guatemala Justia) |
-| **Retrieval method** | Structured scrape from guatemala.justia.com |
-| **Language** | Spanish |
-| **Coverage** | 337 Guatemalan statutes |
-| **Database size** | ~0.4 MB (growing as parsing completes) |
-
-### Automated Freshness Checks
-
-A GitHub Actions workflow monitors for statute changes and amendments:
-
-| Check | Method |
-|-------|--------|
-| **Statute amendments** | Drift detection against known provision anchors |
-| **New statutes** | Comparison against source index |
-| **Repealed statutes** | Status change detection |
-
-**Verified data only** -- every citation is validated against official sources. Zero LLM-generated content.
+Automated freshness checks are paused while the corpus is empty.
 
 ---
 
