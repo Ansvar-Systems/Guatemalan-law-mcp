@@ -1,8 +1,8 @@
 {
   "name": "@ansvar/guatemalan-law-mcp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "mcpName": "eu.ansvar/guatemalan-law-mcp",
-  "description": "Guatemala law database -- legislation from cenadoj.gob.gt with full-text search and citation validation",
+  "description": "Guatemala partial-corpus law MCP -- 8 primary national codes plus the 1985 Constitution from open public sources, with full-text search and citation validation",
   "author": "Ansvar Systems <hello@ansvar.eu>",
   "license": "Apache-2.0",
   "repository": {
