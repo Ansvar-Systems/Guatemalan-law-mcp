@@ -24,4 +24,4 @@ RUN addgroup -S nodejs && adduser -S nodejs -G nodejs \
 USER nodejs
 
 ENV NODE_ENV=production
-CMD ["node", "dist/src/http-server.js"]
+CMD ["node", "dist/http-server.js"]
